@@ -32,16 +32,6 @@ glucose_mean = float(scaler_dict['glucose_mean'])
 glucose_std = float(scaler_dict['glucose_std'])
 bmi_mean = float(scaler_dict['bmi_mean'])
 bmi_std = float(scaler_dict['bmi_std'])
-# w = csv.DictWriter(f, mydict.keys())
-# w.writerow(mydict)
-# f.close()
-# df_scaler = pd.read_csv('scaler_means_stds.csv')
-# age_mean = df_scaler['age_mean'][0]
-# age_std = df_scaler['age_std'][0]
-# glucose_mean = df_scaler['avg_glucose_level_mean'][0]
-# glucose_std = df_scaler['avg_glucose_level_std'][0]
-# bmi_mean = df_scaler['bmi_mean'][0]
-# bmi_std = df_scaler['bmi_std'][0]
 
 # Function to handle the 'Predict' button click
 def on_predict():
@@ -96,31 +86,38 @@ def on_predict():
 
     # One hot encoding
     # One-Hot Encoding for work_type (assuming a dropdown for work_type in your UI)
-    work_type_categories = ['Self-employed', 'Govt_job', 'children', 'Never_worked']  # 'Private' is the dropped category
+    work_type_categories = [1, 2, 3, 4]  # 'Private' is the dropped category
     work_type_input = input_data['Work Type']
     for category in work_type_categories:
-        input_data[f'work_type_{category}'] = 1 if work_type_input == category else 0
+        input_data[f'work_type_{str(category)}'] = 1 if work_type_input == category else 0
 
     # One-Hot Encoding for smoking_status
-    smoking_status_categories = ['never_smoked', 'smokes', 'Unknown']  # 'formerly smoked' is the dropped category
+    smoking_status_categories = [1, 2, 3]  # 'formerly smoked' is the dropped category
     smoking_status_input = input_data['Smoking Status']
     for category in smoking_status_categories:
-        input_data[f'smoking_status_{category}'] = 1 if smoking_status_input == category else 0
+        input_data[f'smoking_status_{str(category)}'] = 1 if smoking_status_input == category else 0
+    
+    gender_categories = [0, 1]
+    gender_input = input_data['Gender']
+    for category in gender_categories:
+        input_data[f'gender_{str(category)}'] = 1 if gender_input == category else 0
+
 
     # Remove original categorical variables
     del input_data['Work Type']
     del input_data['Smoking Status']
+    del input_data['Gender']
 
     # Scaler 
     input_data['Age'] = (float(input_data['Age']) - age_mean) / age_std
     input_data['Avg Glucose Level'] = (float(input_data['Avg Glucose Level']) - glucose_mean) / glucose_std
     input_data['BMI'] = (float(input_data['BMI']) - bmi_mean) / bmi_std
 
-    print(input_data)
+    # print(input_data)
 
     # Load your models (Random Forest and Neural Network)
     random_forest_model = load('random_forest_model.joblib')
-    neural_network_model = SimpleNN(15, 30, 1)
+    neural_network_model = SimpleNN(16, 32, 1)
     neural_network_model.load_state_dict(torch.load('neural_network_model.pth'))
     neural_network_model.eval()  # Set the model to evaluation mode
     
@@ -128,7 +125,6 @@ def on_predict():
 
     # Define the input values and column names
     input_values = [
-        float(input_data['Gender']),
         float(input_data['Age']),
         float(input_data['Hypertension']),
         float(input_data['Previous Heart Disease']),
@@ -136,19 +132,21 @@ def on_predict():
         float(input_data['Residence Type']),
         float(input_data['Avg Glucose Level']),
         float(input_data['BMI']),
-        float(input_data['work_type_Self-employed']),
-        float(input_data['work_type_Govt_job']),
-        float(input_data['work_type_children']),
-        float(input_data['work_type_Never_worked']),
-        float(input_data['smoking_status_never_smoked']),
-        float(input_data['smoking_status_smokes']),
-        float(input_data['smoking_status_Unknown'])
+        float(input_data['work_type_1']),
+        float(input_data['work_type_2']),
+        float(input_data['work_type_3']),
+        float(input_data['work_type_4']),
+        float(input_data['smoking_status_1']),
+        float(input_data['smoking_status_2']),
+        float(input_data['smoking_status_3']),
+        float(input_data['gender_0']),
+        float(input_data['gender_1'])
     ]
 
     column_names = [
-        'gender', 'age', 'hypertension', 'heart_disease', 'ever_married', 'Residence_type',
+        'age', 'hypertension', 'heart_disease', 'ever_married', 'Residence_type',
         'avg_glucose_level', 'bmi', 'work_type_1', 'work_type_2', 'work_type_3', 'work_type_4',
-        'smoking_status_1', 'smoking_status_2', 'smoking_status_3'
+        'smoking_status_1', 'smoking_status_2', 'smoking_status_3', 'gender_0', 'gender_1'
     ]
 
     # Create a DataFrame with the specified columns and input values
@@ -161,7 +159,6 @@ def on_predict():
 
     # Prepare input data for the Neural Network model
     input_tensor = torch.tensor([
-            float(input_data['Gender']),
             float(input_data['Age']),
             float(input_data['Hypertension']),
             float(input_data['Previous Heart Disease']),
@@ -169,14 +166,16 @@ def on_predict():
             float(input_data['Residence Type']),
             float(input_data['Avg Glucose Level']),
             float(input_data['BMI']),
-            float(input_data['work_type_Self-employed']),
-            float(input_data['work_type_Govt_job']),
-            float(input_data['work_type_children']),
-            float(input_data['work_type_Never_worked']),
-            float(input_data['smoking_status_never_smoked']),
-            float(input_data['smoking_status_smokes']),
-            float(input_data['smoking_status_Unknown'])
-        ])
+            float(input_data['work_type_1']),
+            float(input_data['work_type_2']),
+            float(input_data['work_type_3']),
+            float(input_data['work_type_4']),
+            float(input_data['smoking_status_1']),
+            float(input_data['smoking_status_2']),
+            float(input_data['smoking_status_3']),
+            float(input_data['gender_0']),
+            float(input_data['gender_1'])
+            ])
 
     # Forward pass to get the prediction from the Neural Network model
     neural_network_model.eval()  # Set to evaluation mode
