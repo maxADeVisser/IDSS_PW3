@@ -1,9 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-from joblib import load
+from tkinter import messagebox, ttk
+
+import pandas as pd
 import torch
 import torch.nn as nn
-import pandas as pd
+from joblib import load
+
 
 class SimpleNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
@@ -19,10 +21,11 @@ class SimpleNN(nn.Module):
         x = self.fc2(x)
         x = self.sigmoid(x)
         return x
-    
+
 # read the values from scaler_means_and_stds.csv
 import csv
-with open('scaler_means_stds.csv') as csv_file:
+
+with open('source/scaler_means_stds.csv') as csv_file:
     reader = csv.reader(csv_file)
     scaler_dict = dict(reader)
 
@@ -57,7 +60,7 @@ def on_predict():
     except ValueError:
         messagebox.showerror("Invalid Input", "BMI must be a number.")
         return
-    
+
     # Validate Average Glucose Level
     try:
         avg_glucose_level = float(input_data['Avg Glucose Level'])
@@ -67,7 +70,7 @@ def on_predict():
     except ValueError:
         messagebox.showerror("Invalid Input", "Average Glucose Level must be a number.")
         return
-    
+
     #error if an input is None
     for label, entry in entries.items():
         if entry.get() == '':
@@ -96,7 +99,7 @@ def on_predict():
     smoking_status_input = input_data['Smoking Status']
     for category in smoking_status_categories:
         input_data[f'smoking_status_{str(category)}'] = 1 if smoking_status_input == category else 0
-    
+
     gender_categories = [0, 1]
     gender_input = input_data['Gender']
     for category in gender_categories:
@@ -108,7 +111,7 @@ def on_predict():
     del input_data['Smoking Status']
     del input_data['Gender']
 
-    # Scaler 
+    # Scaler
     input_data['Age'] = (float(input_data['Age']) - age_mean) / age_std
     input_data['Avg Glucose Level'] = (float(input_data['Avg Glucose Level']) - glucose_mean) / glucose_std
     input_data['BMI'] = (float(input_data['BMI']) - bmi_mean) / bmi_std
@@ -118,9 +121,9 @@ def on_predict():
     # Load your models (Random Forest and Neural Network)
     random_forest_model = load('random_forest_model.joblib')
     neural_network_model = SimpleNN(16, 32, 1)
-    neural_network_model.load_state_dict(torch.load('neural_network_model.pth'))
+    neural_network_model.load_state_dict(torch.load('models/neural_network_model.pth'))
     neural_network_model.eval()  # Set the model to evaluation mode
-    
+
     # Assuming 'input_data' contains the input values
 
     # Define the input values and column names
@@ -188,7 +191,7 @@ def on_predict():
     if stroke_bool:
         messagebox.showinfo("Stroke Likelihood Prediction", f"RF predicts stroke. According to neural network there is {neural_network_prediction * 100:.2f}% likelihood of stroke.")
     else:
-        messagebox.showinfo("Stroke Likelihood Prediction", f"RF predicts no stroke. According to neural network there is {neural_network_prediction * 100:.2f}% likelihood of stroke.")    
+        messagebox.showinfo("Stroke Likelihood Prediction", f"RF predicts no stroke. According to neural network there is {neural_network_prediction * 100:.2f}% likelihood of stroke.")
 
 
     pass
@@ -215,7 +218,7 @@ ever_married_options = ["Yes", "No"]
 work_type_options = ["Private", "Self-employed", "Govt_job", "Children", "Never_worked"]
 hypertension_options = ["Yes", "No"]
 
-# Add the input fields to the frame 
+# Add the input fields to the frame
 for i, label in enumerate(labels):
     ttk.Label(frame, text=label).grid(row=i, column=0, sticky=tk.W, padx=5, pady=5)
     if label == 'Gender':

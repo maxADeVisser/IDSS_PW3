@@ -1,4 +1,12 @@
 This .zip file contains X files and Y folders
-
-- data_preprocessing_and_model_training.ipynb : the Jupyter notebook that we used to preprocess and train the two data driven models.
-- user_interface.py : the user interface of the IDSS.
+- Data Folder
+    - healthcare-dataset-stroke-data.csv : original dataset from kaggle
+    - processed_data.csv : the processed dataset used for training the models
+- Source folder
+    - data_preprocessing_and_model_training.ipynb : the Jupyter notebook that we used to preprocess and train the two data driven models.
+    - user_interface.py : the user interface of the IDSS.
+    - scaler_means_stds.csv : file that has the scaling values for when a prediction has to be made in the UI.
+- Model folder
+    - load_models.ipynb : a notebook to load the models in memory and display the model parameters
+    - neural_network_model.pth : the saved weights of the Multilayer Perceptron
+    - rf_model.pkl : the trained random forest model saved as a pickle file.
