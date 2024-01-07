@@ -119,7 +119,7 @@ def on_predict():
     # print(input_data)
 
     # Load your models (Random Forest and Neural Network)
-    random_forest_model = load('random_forest_model.joblib')
+    random_forest_model = load('models/random_forest_model.joblib')
     neural_network_model = SimpleNN(16, 32, 1)
     neural_network_model.load_state_dict(torch.load('models/neural_network_model.pth'))
     neural_network_model.eval()  # Set the model to evaluation mode

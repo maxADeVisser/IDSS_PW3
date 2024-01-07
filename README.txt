@@ -9,4 +9,5 @@ This .zip file contains X files and Y folders
 - Model folder
     - load_models.ipynb : a notebook to load the models in memory and display the model parameters
     - neural_network_model.pth : the saved weights of the Multilayer Perceptron
-    - rf_model.pkl : the trained random forest model saved as a pickle file.
+    - random_forest_model.pkl : the trained random forest model saved as a pickle file.
+    - random_forest_model.joblib : the same random forest model saved as a .joblib file for loading in the UI
